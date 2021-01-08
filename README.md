@@ -28,4 +28,19 @@ The Makefile in this repo has a bunch of useful recipes that you can use:
 4. `make run` runs your kernel in qemu with no debugger.
 5. `make clean` removes all compiled object files.
 
+## Adding to the Shell Code
+
+The best way to add features is to create a new source file in the `src` directory. If you create a new source file, you will need to add it to the `OBJS` list in the Makefile (starting around line 15). For example, say you create a new file called `src/neil.c`. You will need add a new line in the Makefile:
+
+
+```
+OBJS = \
+	boot.o \
+    kernel_main.o \
+    neil.o \
+
+```
+
+Note that the new line we added to the `OBJS` list was `neil.o`, not `neil.c`. Also, you need to make sure you have an empty line after the last element of the `OBJS` list, otherwise `make` will complain.
+
 
