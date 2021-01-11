@@ -3,14 +3,56 @@
 
 This is a shell for a custom bare metal operating system on the Raspberry Pi. It is intended to be run inside `qemu` on the Raspberry Pi 3 target (when this doc was written, there was no Pi 4 target).
 
+## Tools
+
+You first need to upgrade all your system's software:
+
+```
+pi@raspberrypi:~ $ sudo apt update && sudo apt upgrade
+```
+
+
+```
+pi@raspberrypi:~ $ sudo apt install qemu-system-arm vim screen
+```
+
+
+
 
 ## The Boot Process
 
 On most ARM systems, we use `u-boot` to load the OS. The Pi does not do that---it has a weird boot process.
 
 1. On power up, the ARM CPU is held in reset while the GPU loads and begins executing a hard-coded bootloader. 
-2. The GPU bootloader loads some firmware files out of the first partition of the SD card. One of the files on the SD card is the Linux kernel, and it must be called `kernel8.img`. The Linux kernel has a special Raspberry Pi-specific header that tells the GPU bootloader where it should be placed in memory.
+2. The GPU bootloader loads some firmware files (bootcode.bin) out of the first partition of the SD card. `bootcode.bin` runs on the GPU and its job is to load the Linux kernel, which is also located on the first partition of the SD card. The kernel image must be called `kernel8.img` so the GPU bootloader can identify it. The Linux kernel image has a special Raspberry Pi-specific header (see table below) that tells the GPU bootloader where it should be placed in memory.
 3. After the GPU bootloader is done loading the kernel into main memory, it brings the ARM CPU out of reset, and the ARM begins running the kernel.
+
+| Field Contents    | Field Length | Notes                                           |
+|-------------------|--------------|-------------------------------------------------|
+| ASM Instruction   | 32 bits      | The first two fields in the header give us      |
+|-------------------|--------------| space to write two assembly instructions. These |
+| ASM Instruction   | 32 bits      | are used to jump to the kernel's entry point.   |
+|-------------------|--------------|-------------------------------------------------|
+| Kernel Image Size | 64 bits      | Tells the bootloader size of the kernel image.  |
+|-------------------|--------------|-------------------------------------------------|
+| Flags             | 64 bits      | Tells endianness, page size, and physical       |
+|                   |              | placement of the kernel. PiOS uses flags =      |
+|                   |              | 0x0000000000000002 which gives us little endian |
+|                   |              | kernel with 4kb page size aligned as close as   |
+|                   |              | possible to the base of DRAM.                   |
+|-------------------|--------------|-------------------------------------------------|
+| Reserved          | 64 bits      | Unused                                          |
+|-------------------|--------------|-------------------------------------------------|
+| Reserved          | 64 bits      | Unused                                          |
+|-------------------|--------------|-------------------------------------------------|
+| Reserved          | 64 bits      | Unused                                          |
+|-------------------|--------------|-------------------------------------------------|
+| Magic Number      | 64 bits      | Set to 0x00000000644D5241 to indicate valid     |
+|                   |              | kernel image.
+|-------------------|--------------|-------------------------------------------------|
+| Reserved          | 64 bits      | Unused                                          |
+|-------------------|--------------|-------------------------------------------------|
+
 
 
 
