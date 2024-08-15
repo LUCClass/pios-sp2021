@@ -13,7 +13,7 @@ pi@raspberrypi:~ $ sudo apt update && sudo apt upgrade
 
 
 ```
-pi@raspberrypi:~ $ sudo apt install qemu-system-arm vim screen gcc-aarch64-linux-gnu gdb-multiarch
+pi@raspberrypi:~ $ sudo apt install qemu-system-arm vim screen gcc-aarch64-linux-gnu gdb-multiarch make git
 ```
 
 
