@@ -6,7 +6,7 @@ OBJDUMP := aarch64-linux-gnu--objdump
 OBJCOPY := aarch64-linux-gnu-objcopy
 CONFIGS := -DCONFIG_HEAP_SIZE=4096
 
-CFLAGS := -O0 -ffreestanding -fno-pie -fno-stack-protector -g3 -mcpu=cortex-a53 -Wall $(CONFIGS)
+CFLAGS := -O0 -ffreestanding -fno-pie -fno-stack-protector -g3 -mcpu=cortex-a53+nofp -Wall $(CONFIGS)
 
 
 ODIR = obj
